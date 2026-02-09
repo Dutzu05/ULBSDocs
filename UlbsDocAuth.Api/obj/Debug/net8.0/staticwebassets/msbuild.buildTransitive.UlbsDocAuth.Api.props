@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../buildMultiTargeting/UlbsDocAuth.Api.props" />
+</Project>
