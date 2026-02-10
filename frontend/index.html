@@ -12,7 +12,8 @@
   <pre id="out"></pre>
 
   <script>
-    const BACKEND_URL = "http://localhost:5144/auth/google";
+    const BACKEND_AUTH_URL = "http://localhost:5144/auth/google";
+    const BACKEND_MOCK_URL = "http://localhost:5144/api/certificates/mock";
     const CLIENT_ID = "428144697724-tguuae6k2abj8115ap1phrgcmig37qtf.apps.googleusercontent.com";
 
     function show(obj) {
@@ -21,10 +22,20 @@
       else console.log(obj);
     }
 
+    async function fetchMock(email) {
+      const res = await fetch(`${BACKEND_MOCK_URL}?email=${encodeURIComponent(email)}`);
+      if (!res.ok) {
+        const text = await res.text();
+        return { error: `Mock API failed: ${res.status}`, details: text };
+      }
+      return res.json();
+    }
+
     async function sendToBackend(idToken) {
       const statusEl = document.getElementById("status");
+
       try {
-        const res = await fetch(BACKEND_URL, {
+        const res = await fetch(BACKEND_AUTH_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idToken })
@@ -37,9 +48,16 @@
           return;
         }
 
-        const data = await res.json();
-        if (statusEl) statusEl.textContent = `Logged in as: ${data.email ?? "(no email returned)"}`;
-        show(data);
+        const login = await res.json();
+        if (statusEl) statusEl.textContent = `Logged in as: ${login.email ?? "(no email returned)"}`;
+
+        // dacă ai email, ia și datele mock
+        let mock = null;
+        if (login.email) {
+          mock = await fetchMock(login.email);
+        }
+
+        show({ login, mock });
       } catch (err) {
         if (statusEl) statusEl.textContent = `Error: ${err.message}`;
         show({ error: err.message });
@@ -49,13 +67,9 @@
     window.onload = () => {
       google.accounts.id.initialize({
         client_id: CLIENT_ID,
-        callback: (response) => {
-          // response.credential is the Google ID token (JWT)
-          sendToBackend(response.credential);
-        }
+        callback: (response) => sendToBackend(response.credential)
       });
 
-      // Render button into a dedicated container (NOT document.body)
       google.accounts.id.renderButton(
         document.getElementById("g-signin-btn"),
         { theme: "outline", size: "large" }
