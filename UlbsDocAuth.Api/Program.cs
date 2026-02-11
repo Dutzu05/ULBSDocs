@@ -23,6 +23,9 @@ var app = builder.Build();
 
 app.UseCors("DevCors");
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
