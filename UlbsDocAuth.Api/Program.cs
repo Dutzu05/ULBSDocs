@@ -1,18 +1,23 @@
+using UlbsDocAuth.Api.Services.Interfaces;
+using UlbsDocAuth.Api.Services.Mock;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCors", policy =>
-        policy.WithOrigins("http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod()
     );
 });
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// register mock service
+builder.Services.AddSingleton<ICertificateDataService, MockCertificateDataService>();
 
 var app = builder.Build();
 
@@ -24,7 +29,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// HTTPS disabled for now
 app.MapControllers();
-
 app.Run();
