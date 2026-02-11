@@ -4,3 +4,4 @@
 *.user
 *.cache
 *.exe
+**/packages/
