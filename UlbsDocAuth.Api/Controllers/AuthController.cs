@@ -18,6 +18,12 @@ public class AuthController : ControllerBase
     [HttpPost("google")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request?.IdToken))
+        {
+            return BadRequest(new { error = "Missing Google ID token" });
+        }
+
+
         var clientId = _config["GoogleAuth:ClientId"];
 
         if (string.IsNullOrEmpty(clientId))
@@ -34,13 +40,19 @@ public class AuthController : ControllerBase
                     Audience = new[] { clientId }
                 });
         }
-        catch
+        catch (InvalidJwtException)
         {
             return Unauthorized("Invalid Google token");
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Google token validation failed");
         }
 
         // At this point, the token is VERIFIED
         // payload contains trusted user info
+        if (payload.EmailVerified != true)
+            return Forbid("Google account email is not verified");
 
         return Ok(new
         {
