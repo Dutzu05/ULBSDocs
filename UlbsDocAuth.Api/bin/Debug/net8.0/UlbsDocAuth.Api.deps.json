@@ -8,12 +8,36 @@
     ".NETCoreApp,Version=v8.0": {
       "UlbsDocAuth.Api/1.0.0": {
         "dependencies": {
+          "DocumentFormat.OpenXml": "3.4.1",
           "Google.Apis.Auth": "1.73.0",
           "Microsoft.AspNetCore.OpenApi": "8.0.22",
+          "Spire.Doc": "14.1.12",
           "Swashbuckle.AspNetCore": "6.6.2"
         },
         "runtime": {
           "UlbsDocAuth.Api.dll": {}
+        }
+      },
+      "DocumentFormat.OpenXml/3.4.1": {
+        "dependencies": {
+          "DocumentFormat.OpenXml.Framework": "3.4.1"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.dll": {
+            "assemblyVersion": "3.4.1.0",
+            "fileVersion": "3.4.1.0"
+          }
+        }
+      },
+      "DocumentFormat.OpenXml.Framework/3.4.1": {
+        "dependencies": {
+          "System.IO.Packaging": "8.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
+            "assemblyVersion": "3.4.1.0",
+            "fileVersion": "3.4.1.0"
+          }
         }
       },
       "Google.Apis/1.73.0": {
@@ -51,6 +75,46 @@
           }
         }
       },
+      "HarfBuzzSharp/8.3.0.1": {
+        "dependencies": {
+          "HarfBuzzSharp.NativeAssets.Win32": "8.3.0.1",
+          "HarfBuzzSharp.NativeAssets.macOS": "8.3.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/HarfBuzzSharp.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "8.3.0.1"
+          }
+        }
+      },
+      "HarfBuzzSharp.NativeAssets.macOS/8.3.0.1": {
+        "runtimeTargets": {
+          "runtimes/osx/native/libHarfBuzzSharp.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "HarfBuzzSharp.NativeAssets.Win32/8.3.0.1": {
+        "runtimeTargets": {
+          "runtimes/win-arm64/native/libHarfBuzzSharp.dll": {
+            "rid": "win-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/libHarfBuzzSharp.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x86/native/libHarfBuzzSharp.dll": {
+            "rid": "win-x86",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "Microsoft.AspNetCore.OpenApi/8.0.22": {
         "dependencies": {
           "Microsoft.OpenApi": "1.6.14"
@@ -62,12 +126,27 @@
           }
         }
       },
-      "Microsoft.Extensions.ApiDescription.Server/6.0.5": {},
       "Microsoft.OpenApi/1.6.14": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.OpenApi.dll": {
             "assemblyVersion": "1.6.14.0",
             "fileVersion": "1.6.14.0"
+          }
+        }
+      },
+      "Microsoft.Win32.SystemEvents/6.0.0": {
+        "runtime": {
+          "lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net6.0/Microsoft.Win32.SystemEvents.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
           }
         }
       },
@@ -79,9 +158,20 @@
           }
         }
       },
+      "Spire.Doc/14.1.12": {
+        "dependencies": {
+          "HarfBuzzSharp": "8.3.0.1",
+          "System.Drawing.Common": "6.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/Spire.Doc.dll": {
+            "assemblyVersion": "14.1.12.0",
+            "fileVersion": "14.1.12.3360"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/6.6.2": {
         "dependencies": {
-          "Microsoft.Extensions.ApiDescription.Server": "6.0.5",
           "Swashbuckle.AspNetCore.Swagger": "6.6.2",
           "Swashbuckle.AspNetCore.SwaggerGen": "6.6.2",
           "Swashbuckle.AspNetCore.SwaggerUI": "6.6.2"
@@ -125,6 +215,39 @@
           }
         }
       },
+      "System.Drawing.Common/6.0.0": {
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "6.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/System.Drawing.Common.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/unix/lib/net6.0/System.Drawing.Common.dll": {
+            "rid": "unix",
+            "assetType": "runtime",
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          },
+          "runtimes/win/lib/net6.0/System.Drawing.Common.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        }
+      },
+      "System.IO.Packaging/8.0.1": {
+        "runtime": {
+          "lib/net8.0/System.IO.Packaging.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.1024.46610"
+          }
+        }
+      },
       "System.Management/7.0.2": {
         "dependencies": {
           "System.CodeDom": "7.0.0"
@@ -152,6 +275,20 @@
       "serviceable": false,
       "sha512": ""
     },
+    "DocumentFormat.OpenXml/3.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-iM7k4Spo6ZxxudxLVGcvFLIcF6XJ65aOAsJ24o75CaKGBTuj33cL1O7qnGkQW0+ONOUFff+mWafpZYaa7rNBbg==",
+      "path": "documentformat.openxml/3.4.1",
+      "hashPath": "documentformat.openxml.3.4.1.nupkg.sha512"
+    },
+    "DocumentFormat.OpenXml.Framework/3.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-H7l8l84uRb+LTjijpe6PuVDlIDM28s7f//zxss6f1yK1qnaxAEZwRecPkjfE3vjFM7QZ7X4XGF4nicnIynJrBw==",
+      "path": "documentformat.openxml.framework/3.4.1",
+      "hashPath": "documentformat.openxml.framework.3.4.1.nupkg.sha512"
+    },
     "Google.Apis/1.73.0": {
       "type": "package",
       "serviceable": true,
@@ -173,19 +310,33 @@
       "path": "google.apis.core/1.73.0",
       "hashPath": "google.apis.core.1.73.0.nupkg.sha512"
     },
+    "HarfBuzzSharp/8.3.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rwLpl+W6uqu0DuvzqNhTMuFcXfy1Vc0uq0YXgPEmtTSfeUSAye1FcARrm2YIPOSiCBwBOGu3cLvMX5Fp6OKe2g==",
+      "path": "harfbuzzsharp/8.3.0.1",
+      "hashPath": "harfbuzzsharp.8.3.0.1.nupkg.sha512"
+    },
+    "HarfBuzzSharp.NativeAssets.macOS/8.3.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2o6U05LAmK+rwX7TvmJ2X0anXJG2hSE7kHVmCshhHy0tKfByJ5ykBacvhmmooHchlOwq15KBZeROGafCT8nN+g==",
+      "path": "harfbuzzsharp.nativeassets.macos/8.3.0.1",
+      "hashPath": "harfbuzzsharp.nativeassets.macos.8.3.0.1.nupkg.sha512"
+    },
+    "HarfBuzzSharp.NativeAssets.Win32/8.3.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ow0DtGEUjo65qhiI22of7qiVbN1xDFsZ5P5xJljRmGZ5WSxNy+1batLNJFGxahqhB1MTHYV8kAXf0GqC8WaevQ==",
+      "path": "harfbuzzsharp.nativeassets.win32/8.3.0.1",
+      "hashPath": "harfbuzzsharp.nativeassets.win32.8.3.0.1.nupkg.sha512"
+    },
     "Microsoft.AspNetCore.OpenApi/8.0.22": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-NljWP+NNJDu3Uls1OxiIrhOnhRTCdpJNLukJFMrBIPU1FyencrBFpgHiUuv/K5TqDPE7iKaZVreDSHSVhk4QrA==",
       "path": "microsoft.aspnetcore.openapi/8.0.22",
       "hashPath": "microsoft.aspnetcore.openapi.8.0.22.nupkg.sha512"
-    },
-    "Microsoft.Extensions.ApiDescription.Server/6.0.5": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-Ckb5EDBUNJdFWyajfXzUIMRkhf52fHZOQuuZg/oiu8y7zDCVwD0iHhew6MnThjHmevanpxL3f5ci2TtHQEN6bw==",
-      "path": "microsoft.extensions.apidescription.server/6.0.5",
-      "hashPath": "microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512"
     },
     "Microsoft.OpenApi/1.6.14": {
       "type": "package",
@@ -194,12 +345,26 @@
       "path": "microsoft.openapi/1.6.14",
       "hashPath": "microsoft.openapi.1.6.14.nupkg.sha512"
     },
+    "Microsoft.Win32.SystemEvents/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hqTM5628jSsQiv+HGpiq3WKBl2c8v1KZfby2J6Pr7pEPlK9waPdgEO6b8A/+/xn/yZ9ulv8HuqK71ONy2tg67A==",
+      "path": "microsoft.win32.systemevents/6.0.0",
+      "hashPath": "microsoft.win32.systemevents.6.0.0.nupkg.sha512"
+    },
     "Newtonsoft.Json/13.0.4": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
       "path": "newtonsoft.json/13.0.4",
       "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
+    },
+    "Spire.Doc/14.1.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-eJvOiX/VqIXS3lcNSc+fZifQ5QjGo6SFs1PT6yPHPvPmXGnhY4XUbUD9sHpHaCXb003LYBX0dDHQ8NUPL7alGQ==",
+      "path": "spire.doc/14.1.12",
+      "hashPath": "spire.doc.14.1.12.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/6.6.2": {
       "type": "package",
@@ -235,6 +400,20 @@
       "sha512": "sha512-GLltyqEsE5/3IE+zYRP5sNa1l44qKl9v+bfdMcwg+M9qnQf47wK3H0SUR/T+3N4JEQXF3vV4CSuuo0rsg+nq2A==",
       "path": "system.codedom/7.0.0",
       "hashPath": "system.codedom.7.0.0.nupkg.sha512"
+    },
+    "System.Drawing.Common/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
+      "path": "system.drawing.common/6.0.0",
+      "hashPath": "system.drawing.common.6.0.0.nupkg.sha512"
+    },
+    "System.IO.Packaging/8.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KYkIOAvPexQOLDxPO2g0BVoWInnQhPpkFzRqvNrNrMhVT6kqhVr0zEb6KCHlptLFukxnZrjuMVAnxK7pOGUYrw==",
+      "path": "system.io.packaging/8.0.1",
+      "hashPath": "system.io.packaging.8.0.1.nupkg.sha512"
     },
     "System.Management/7.0.2": {
       "type": "package",

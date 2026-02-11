@@ -1,3 +1,4 @@
+using UlbsDocAuth.Api;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -15,6 +16,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+Console.WriteLine("--- Începe conversia ---");
+Placeholder myConverter = new Placeholder();
+myConverter.ReplacePlaceholder();
+Console.WriteLine("--- Terminare conversie ---");
 
 app.UseCors("DevCors");
 
