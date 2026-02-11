@@ -1,6 +1,0 @@
-POST http://localhost:5144/auth/google
-Content-Type: application/json
-
-{
-  "idToken": "428144697724-a00bmhh6ciguq018jrg667gpd0q0k8ae.apps.googleusercontent.com"
-}
