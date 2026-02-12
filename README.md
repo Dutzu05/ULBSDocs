@@ -1,5 +1,30 @@
 # ULBS Doc Auth
 
+🚀 **ULBS Doc Auth** is a small end-to-end app that:
+- authenticates users via **Google OAuth**
+- lets them upload documents for **conversion** (DOC → DOCX and DOCX → PDF)
+- exposes a clean **ASP.NET Core Web API** + a minimal static **frontend**
+
+## Architecture (at a glance) 🧱
+
+**User flow**
+- Browser loads the static UI from the API (served from `frontend/`)
+- User signs in with Google (Google Identity Services)
+- Frontend calls the API endpoints for conversion and downloads the resulting file
+
+**Runtime components**
+- **Frontend (static HTML/CSS/JS)**: in `frontend/` (login + conversion UI)
+- **API (ASP.NET Core, .NET 8)**: `UlbsDocAuth.Api/`
+  - serves the frontend as static files
+  - exposes REST endpoints for auth, certificates and conversions
+  - contains the conversion controllers (upload-based conversion included)
+- **DOCX → PDF converter helper**: `docx-to-pdf/DocxToPdfConverter/` (a separate converter project used for PDF conversion)
+
+**Testing strategy** ✅
+- `UlbsDocAuth.Api.Tests/`: fast unit + in-memory integration tests
+- `UlbsDocAuth.E2E/`: smoke tests that hit a running API over real HTTP
+- Pre-commit + CI enforce **tests passing** + **≥80% line coverage**
+
 This repo contains:
 - **UlbsDocAuth.Api**: ASP.NET Core Web API (runs on http://localhost:3000 in dev)
 - **UlbsDocAuth.Api.Tests**: unit + in-memory integration tests (fast, no external deps)
