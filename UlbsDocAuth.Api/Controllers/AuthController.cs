@@ -17,6 +17,17 @@ public class AuthController : ControllerBase
         _tokenValidator = tokenValidator;
     }
 
+    [HttpGet("google/client-id")]
+    public IActionResult GetGoogleClientId()
+    {
+        var clientId = _config["GoogleAuth:ClientId"];
+        if (string.IsNullOrWhiteSpace(clientId))
+            return StatusCode(500, new { error = "Google ClientId not configured" });
+
+        // ClientId is not a secret; it is safe to expose to the frontend.
+        return Ok(new { clientId });
+    }
+
     [HttpPost("google")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
     {

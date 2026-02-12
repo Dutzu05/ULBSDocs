@@ -1,0 +1,273 @@
+:root {
+  /* ULBS Official Design System Tokens */
+  
+  /* Spacing scale */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+
+  /* Border radius */
+  --radius-8: 8px;
+  --radius-12: 12px;
+
+  /* Official ULBS Brand Colors */
+  --ulbs-primary: #193B6C;
+  --ulbs-accent-red: #C41230;
+  --ulbs-neutral-dark: #0F2347;
+  --ulbs-white: #FFFFFF;
+  
+  /* Surface and background */
+  --color-bg: #0b1220;
+  --color-surface: var(--ulbs-neutral-dark);
+  --color-surface-2: #122043;
+  --color-border: rgba(255, 255, 255, 0.12);
+  
+  /* Text */
+  --color-text: rgba(255, 255, 255, 0.92);
+  --color-muted: rgba(255, 255, 255, 0.70);
+
+  /* Interactive */
+  --focus-ring: 0 0 0 3px rgba(193, 18, 48, 0.35);
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* Layout */
+  --container: 980px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--ulbs-white);
+  color: #1a1a1a;
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--spacing-16);
+}
+
+.page {
+  padding: var(--spacing-32) 0 var(--spacing-40);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: var(--spacing-8) var(--spacing-12);
+  display: inline-block;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-8);
+}
+
+.app-header {
+  background-color: var(--ulbs-primary);
+  border-bottom: 2px solid var(--ulbs-accent-red);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-24) 0;
+  gap: var(--spacing-16);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.brand-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-12);
+  background: var(--ulbs-primary);
+}
+
+.card-body {
+  padding: var(--spacing-24);
+}
+
+.h1 {
+  margin: 0 0 var(--spacing-8);
+  font-size: 28px;
+  letter-spacing: 0.2px;
+  color: var(--ulbs-white);
+}
+
+.h2 {
+  margin: 0 0 var(--spacing-8);
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  color: var(--ulbs-white);
+}
+
+.muted {
+  margin: 0 0 var(--spacing-16);
+  color: rgba(255, 255, 255, 0.80);
+  line-height: 1.5;
+}
+
+.small {
+  font-size: 13px;
+}
+
+.stack {
+  display: grid;
+  gap: var(--stack-gap, var(--spacing-16));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-16);
+  margin: var(--spacing-16) 0;
+}
+
+@media (min-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: var(--radius-12);
+  background: rgba(255, 255, 255, 0.08);
+  padding: var(--spacing-16);
+}
+
+.label {
+  display: block;
+  margin: var(--spacing-12) 0 var(--spacing-8);
+  color: var(--ulbs-white);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.input {
+  width: 100%;
+  border-radius: var(--radius-8);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ulbs-white);
+  padding: var(--spacing-12);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: rgba(225, 29, 46, 0.5);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-12);
+  margin-top: var(--spacing-16);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+  border-radius: var(--radius-8);
+  border: 1px solid transparent;
+  padding: var(--spacing-12) var(--spacing-16);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, rgba(193, 18, 48, 0.95), rgba(193, 18, 48, 0.85));
+  border-color: rgba(193, 18, 48, 0.65);
+  color: var(--ulbs-white);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--ulbs-white);
+}
+
+.status {
+  margin: 0;
+  min-height: 1.2em;
+  color: var(--ulbs-white);
+}
+
+.code {
+  margin: 0;
+  padding: var(--spacing-12);
+  border-radius: var(--radius-8);
+  border: 1px solid var(--color-border);
+  background: rgba(0, 0, 0, 0.25);
+  overflow: auto;
+  max-height: 260px;
+}
+
+.details summary {
+  cursor: pointer;
+  color: var(--color-muted);
+}
+
+.details summary:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-8);
+}

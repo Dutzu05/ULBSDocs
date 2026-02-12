@@ -1,80 +1,40 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>ULBS Auth MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ULBS Doc Auth</title>
+  <link rel="stylesheet" href="./styles.css" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <h1>Login</h1>
-  <div id="g-signin-btn"></div>
-  <div id="status">Not logged in</div>
-  <pre id="out"></pre>
+  <a class="sr-only" href="#main">Skip to content</a>
 
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand" aria-label="ULBS">
+        <img class="brand-logo" src="./assets/ulbs-logo.svg" alt="Universitatea Lucian Blaga din Sibiu" />
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container page">
+    <section class="card" aria-labelledby="title">
+      <div class="card-body">
+        <h1 id="title" class="h1">Sign in</h1>
+        <p class="muted">Use your Google account to continue.</p>
+
+        <div class="stack" style="--stack-gap: var(--space-16)">
+          <div id="gsi-button" aria-label="Google Sign-In"></div>
+          <p id="status" class="status" role="status" aria-live="polite">Not signed in.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
   <script>
-    const BACKEND_AUTH_URL = "http://localhost:3000/auth/google";
-    const BACKEND_MOCK_URL = "http://localhost:3000/api/certificates/mock";
-    const CLIENT_ID = "428144697724-tguuae6k2abj8115ap1phrgcmig37qtf.apps.googleusercontent.com";
-
-    function show(obj) {
-      const el = document.getElementById("out");
-      if (el) el.textContent = JSON.stringify(obj, null, 2);
-      else console.log(obj);
-    }
-
-    async function fetchMock(email) {
-      const res = await fetch(`${BACKEND_MOCK_URL}?email=${encodeURIComponent(email)}`);
-      if (!res.ok) {
-        const text = await res.text();
-        return { error: `Mock API failed: ${res.status}`, details: text };
-      }
-      return res.json();
-    }
-
-    async function sendToBackend(idToken) {
-      const statusEl = document.getElementById("status");
-
-      try {
-        const res = await fetch(BACKEND_AUTH_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken })
-        });
-
-        if (!res.ok) {
-          const text = await res.text();
-          if (statusEl) statusEl.textContent = `Login failed: ${res.status}`;
-          show({ error: text });
-          return;
-        }
-
-        const login = await res.json();
-        if (statusEl) statusEl.textContent = `Logged in as: ${login.email ?? "(no email returned)"}`;
-
-        // dacă ai email, ia și datele mock
-        let mock = null;
-        if (login.email) {
-          mock = await fetchMock(login.email);
-        }
-
-        show({ login, mock });
-      } catch (err) {
-        if (statusEl) statusEl.textContent = `Error: ${err.message}`;
-        show({ error: err.message });
-      }
-    }
-
-    window.onload = () => {
-      google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: (response) => sendToBackend(response.credential)
-      });
-
-      google.accounts.id.renderButton(
-        document.getElementById("g-signin-btn"),
-        { theme: "outline", size: "large" }
-      );
-    };
+    window.ULBS_APP?.initLoginPage();
   </script>
 </body>
 </html>

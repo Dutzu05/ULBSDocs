@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ULBS Doc Converter</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand" aria-label="ULBS">
+        <img class="brand-logo" src="./assets/ulbs-logo.svg" alt="Universitatea Lucian Blaga din Sibiu" />
+      </div>
+      <div class="header-actions">
+        <button id="logout" class="btn btn-secondary" type="button">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container page">
+    <section class="card" aria-labelledby="title">
+      <div class="card-body">
+        <h1 id="title" class="h1">Convert documents</h1>
+        <p class="muted" id="user"></p>
+
+        <div class="grid">
+          <div class="panel" aria-labelledby="doc-title">
+            <h2 id="doc-title" class="h2">DOC → DOCX</h2>
+            <p class="muted">Upload a <strong>.doc</strong> file and download the converted <strong>.docx</strong>.</p>
+
+            <label class="label" for="docFile">DOC file</label>
+            <input id="docFile" class="input" type="file" accept=".doc,application/msword" />
+
+            <div class="row">
+              <button id="convertDoc" class="btn btn-primary" type="button">Convert to DOCX</button>
+              <a id="downloadDocx" class="btn btn-secondary" href="#" download aria-disabled="true" tabindex="-1">Download DOCX</a>
+            </div>
+          </div>
+
+          <div class="panel" aria-labelledby="pdf-title">
+            <h2 id="pdf-title" class="h2">DOCX → PDF</h2>
+            <p class="muted">Convert the generated DOCX to PDF and download it.</p>
+
+            <div class="row">
+              <button id="convertPdf" class="btn btn-primary" type="button" disabled>Convert to PDF</button>
+              <a id="downloadPdf" class="btn btn-secondary" href="#" download aria-disabled="true" tabindex="-1">Download PDF</a>
+            </div>
+
+            <p class="muted small">Tip: the PDF conversion endpoint accepts only <strong>.docx</strong>.</p>
+          </div>
+        </div>
+
+        <div class="stack" style="--stack-gap: var(--space-12)">
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+  <script>
+    window.ULBS_APP?.initConvertPage();
+  </script>
+</body>
+</html>

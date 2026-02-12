@@ -3,8 +3,16 @@ using UlbsDocAuth.Api.Services.Mock;
 using UlbsDocAuth.Api.Services.Google;
 using UlbsDocAuth.Api.Services.DocxToPdf;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.FileProviders;
 
-var builder = WebApplication.CreateBuilder(args);
+// Prefer serving the repo-level /frontend as the web root when present.
+// IMPORTANT: WebRoot must be configured via WebApplicationOptions during CreateBuilder.
+var frontendWebRoot = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "frontend"));
+var builderOptions = Directory.Exists(frontendWebRoot)
+    ? new WebApplicationOptions { Args = args, WebRootPath = frontendWebRoot }
+    : new WebApplicationOptions { Args = args };
+
+var builder = WebApplication.CreateBuilder(builderOptions);
 
 builder.Services.AddCors(options =>
 {
@@ -35,6 +43,19 @@ app.UseCors("DevCors");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+// Also serve UlbsDocAuth.Api/wwwroot as a secondary static source (e.g. legacy google-test.html)
+var legacyWwwroot = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+var currentWebRoot = app.Environment.WebRootPath;
+if (Directory.Exists(legacyWwwroot)
+    && !string.Equals(
+        Path.GetFullPath(legacyWwwroot).TrimEnd(Path.DirectorySeparatorChar),
+        Path.GetFullPath(currentWebRoot ?? string.Empty).TrimEnd(Path.DirectorySeparatorChar),
+        StringComparison.OrdinalIgnoreCase))
+{
+    var legacyProvider = new PhysicalFileProvider(legacyWwwroot);
+    app.UseStaticFiles(new StaticFileOptions { FileProvider = legacyProvider });
+}
 
 if (app.Environment.IsDevelopment())
 {
