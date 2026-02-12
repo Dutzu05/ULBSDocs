@@ -1,25 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Spire.Doc;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using UlbsDocAuth.Api.Services.Interfaces;
 
 namespace UlbsDocAuth.Api.Controllers;
 
 [ApiController]
 [Route("api/docx-to-pdf")]
-public class DocxToPdfController(IHostEnvironment environment) : ControllerBase
+public class DocxToPdfController(IHostEnvironment environment, IDocxToPdfConverter converter) : ControllerBase
 {
-    [HttpGet("convert")]
-    public IActionResult ConvertInfo()
-    {
-        return Ok(new
-        {
-            message = "Use POST /api/docx-to-pdf/convert with multipart/form-data.",
-            field = "file",
-            exampleCurl = "curl -X POST http://localhost:3000/api/docx-to-pdf/convert -F \"file=@/path/to/input.docx\" --output output.pdf"
-        });
-    }
-
     [HttpPost("convert")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Convert(IFormFile file, CancellationToken cancellationToken)
@@ -44,85 +31,19 @@ public class DocxToPdfController(IHostEnvironment environment) : ControllerBase
                 await file.CopyToAsync(inputStream, cancellationToken);
             }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            try
             {
-                var document = new Document();
-                document.LoadFromFile(tempInput);
-                document.SaveToFile(tempOutput, FileFormat.PDF);
+                await converter.ConvertAsync(tempInput, tempOutput, cancellationToken);
             }
-            else
+            catch (Exception startEx) when (startEx is System.ComponentModel.Win32Exception)
             {
-                // .NET 8: System.Drawing.Common is not supported on Linux; Spire's PDF path triggers it.
-                // Use LibreOffice headless for cross-platform conversion.
-                var outputDir = Path.GetDirectoryName(tempOutput)!;
-                var process = new Process
+                // e.g. 'soffice' missing on Linux
+                return StatusCode(501, new
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "soffice",
-                        ArgumentList =
-                        {
-                            "--headless",
-                            "--nologo",
-                            "--nofirststartwizard",
-                            "--convert-to",
-                            "pdf",
-                            "--outdir",
-                            outputDir,
-                            tempInput
-                        },
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                try
-                {
-                    process.Start();
-                }
-                catch (Exception startEx)
-                {
-                    return StatusCode(501, new
-                    {
-                        error = "LibreOffice (soffice) is required for DOCX->PDF on Linux.",
-                        details = environment.IsDevelopment() ? startEx.ToString() : startEx.Message,
-                        hint = "Install with: sudo apt update && sudo apt install -y libreoffice"
-                    });
-                }
-
-                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                timeoutCts.CancelAfter(TimeSpan.FromSeconds(60));
-                await process.WaitForExitAsync(timeoutCts.Token);
-
-                var stdout = await process.StandardOutput.ReadToEndAsync(timeoutCts.Token);
-                var stderr = await process.StandardError.ReadToEndAsync(timeoutCts.Token);
-
-                if (process.ExitCode != 0)
-                {
-                    return StatusCode(500, new
-                    {
-                        error = "LibreOffice conversion failed.",
-                        exitCode = process.ExitCode,
-                        stdout,
-                        stderr
-                    });
-                }
-
-                // LibreOffice names output based on input file name in the output directory.
-                var expectedOut = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(tempInput) + ".pdf");
-                if (!System.IO.File.Exists(expectedOut))
-                {
-                    return StatusCode(500, new
-                    {
-                        error = "LibreOffice reported success but PDF was not found.",
-                        stdout,
-                        stderr
-                    });
-                }
-
-                System.IO.File.Move(expectedOut, tempOutput, overwrite: true);
+                    error = "DOCX->PDF converter dependency is missing.",
+                    details = environment.IsDevelopment() ? startEx.ToString() : startEx.Message,
+                    hint = "On Linux: sudo apt update && sudo apt install -y libreoffice"
+                });
             }
 
             var pdfBytes = await System.IO.File.ReadAllBytesAsync(tempOutput, cancellationToken);

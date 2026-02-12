@@ -1,0 +1,30 @@
+name: e2e-staging
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Staging base URL (e.g. https://staging.example.com)"
+        required: false
+        type: string
+
+jobs:
+  e2e:
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.base_url != '') || (secrets.STAGING_BASE_URL != '') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run E2E smoke tests
+        env:
+          E2E_BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || secrets.STAGING_BASE_URL }}
+        run: |
+          dotnet test UlbsDocAuth.E2E/UlbsDocAuth.E2E.csproj -c Release --filter "Category=E2E"

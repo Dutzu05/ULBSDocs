@@ -1,6 +1,6 @@
-using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
 using UlbsDocAuth.Api.DTOs;
+using UlbsDocAuth.Api.Services.Interfaces;
 
 namespace UlbsDocAuth.Api.Controllers;
 
@@ -9,10 +9,12 @@ namespace UlbsDocAuth.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly IGoogleIdTokenValidator _tokenValidator;
 
-    public AuthController(IConfiguration config)
+    public AuthController(IConfiguration config, IGoogleIdTokenValidator tokenValidator)
     {
         _config = config;
+        _tokenValidator = tokenValidator;
     }
 
     [HttpPost("google")]
@@ -29,17 +31,12 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(clientId))
             return StatusCode(500, "Google ClientId not configured");
 
-        GoogleJsonWebSignature.Payload payload;
+        GoogleIdTokenPayload payload;
         try
         {
-            payload = await GoogleJsonWebSignature.ValidateAsync(
-                request.IdToken,
-                new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { clientId }
-                });
+            payload = await _tokenValidator.ValidateAsync(request.IdToken, clientId, HttpContext.RequestAborted);
         }
-        catch (InvalidJwtException)
+        catch (Exception ex) when (ex.GetType().Name is "InvalidJwtException")
         {
             return Unauthorized("Invalid Google token");
         }
@@ -51,7 +48,7 @@ public class AuthController : ControllerBase
         // At this point, the token is VERIFIED
         // payload contains trusted user info
         if (payload.EmailVerified != true)
-            return Forbid("Google account email is not verified");
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Google account email is not verified" });
 
         return Ok(new
         {

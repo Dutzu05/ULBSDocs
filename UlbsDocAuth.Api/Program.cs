@@ -1,5 +1,8 @@
 using UlbsDocAuth.Api.Services.Interfaces;
 using UlbsDocAuth.Api.Services.Mock;
+using UlbsDocAuth.Api.Services.Google;
+using UlbsDocAuth.Api.Services.DocxToPdf;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,13 @@ builder.Services.AddSwaggerGen();
 
 // register mock service
 builder.Services.AddSingleton<ICertificateDataService, MockCertificateDataService>();
+
+builder.Services.AddSingleton<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
+
+builder.Services.AddSingleton<IDocxToPdfConverter>(_ =>
+    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? new SpireDocxToPdfConverter()
+        : new LibreOfficeDocxToPdfConverter());
 
 var app = builder.Build();
 
