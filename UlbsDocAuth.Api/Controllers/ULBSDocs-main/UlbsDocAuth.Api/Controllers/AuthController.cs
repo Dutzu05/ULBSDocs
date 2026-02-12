@@ -1,0 +1,52 @@
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Mvc;
+using UlbsDocAuth.Api.DTOs;
+
+namespace UlbsDocAuth.Api.Controllers;
+
+[ApiController]
+[Route("auth")]
+public class AuthController : ControllerBase
+{
+    private readonly IConfiguration _config;
+
+    public AuthController(IConfiguration config)
+    {
+        _config = config;
+    }
+
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        var clientId = _config["GoogleAuth:ClientId"];
+
+        if (string.IsNullOrEmpty(clientId))
+            return StatusCode(500, "Google ClientId not configured");
+
+        GoogleJsonWebSignature.Payload payload;
+
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(
+                request.IdToken,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { clientId }
+                });
+        }
+        catch
+        {
+            return Unauthorized("Invalid Google token");
+        }
+
+        // At this point, the token is VERIFIED
+        // payload contains trusted user info
+
+        return Ok(new
+        {
+            payload.Email,
+            payload.Name,
+            payload.Subject // Google's unique user ID
+        });
+    }
+}
