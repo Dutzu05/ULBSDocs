@@ -100,4 +100,37 @@ public class ApiIntegrationTests : IClassFixture<ApiFactory>
         var res = await _client.PostAsync("/api/doc-docx/convert", content);
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
     }
+    [Fact]
+    public async Task DocDocx_Convert_Get_ReturnsDocx()
+    {
+        var res = await _client.GetAsync("/api/doc-docx/convert");
+        
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        Assert.Equal(
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            res.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task DocDocx_ConvertUpload_EmptyFile_ReturnsBadRequest()
+    {
+        using var content = new MultipartFormDataContent();
+        content.Add(new ByteArrayContent(Array.Empty<byte>()), "file", "empty.doc");
+
+        var res = await _client.PostAsync("/api/doc-docx/convert", content);
+        
+        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+    }
+
+    [Fact]
+    public async Task DocDocx_ConvertUpload_TooLargeFile_ReturnsBadRequest()
+    {
+        using var content = new MultipartFormDataContent();
+        var largeData = new byte[(25 * 1024 * 1024) + 1];
+        content.Add(new ByteArrayContent(largeData), "file", "large.doc");
+
+        var res = await _client.PostAsync("/api/doc-docx/convert", content);
+        
+        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+    }
 }

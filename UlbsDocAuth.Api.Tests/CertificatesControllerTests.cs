@@ -59,4 +59,55 @@ public class CertificatesControllerTests
 
         Assert.IsType<OkObjectResult>(result);
     }
+    [Fact]
+    public async Task GenerateCertificate_InvalidEmail_ReturnsBadRequest()
+    {
+        var request = new GenerateRequest("", "Motiv");
+        var controller = CreateController();
+
+        var result = await controller.GenerateCertificate(request);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+    [Fact]
+    public async Task GenerateCertificate_StudentNotFound_ReturnsNotFound()
+    {
+        var request = new GenerateRequest("inexistent@ulbs.ro", "Motiv");
+        _dataServiceMock.Setup(s => s.GetByEmail(request.Email)).Returns((CertificateResponse?)null);
+        var controller = CreateController();
+
+        var result = await controller.GenerateCertificate(request);
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+   [Fact]
+    public async Task GenerateCertificate_Success_ReturnsFile()
+    {
+        var request = new GenerateRequest("valid@ulbs.ro", "Bursa");
+        var student = new CertificateResponse(request.Email, "Ion", "F", "P", 1, "G", "S", DateOnly.FromDateTime(DateTime.Now));
+        
+        var tempDocx = Path.GetTempFileName();
+        var tempPdf = Path.ChangeExtension(tempDocx, ".pdf");
+        await System.IO.File.WriteAllBytesAsync(tempPdf, new byte[] { 1, 2, 3 });
+
+        try 
+        {
+            _dataServiceMock.Setup(s => s.GetByEmail(request.Email)).Returns(student);
+            _templateServiceMock.Setup(s => s.GenerateDocx(student, request.Reason)).Returns(tempDocx);
+            _pdfConverterMock.Setup(c => c.ConvertAsync(tempDocx, tempPdf, It.IsAny<CancellationToken>()))
+                             .Returns(Task.CompletedTask);
+
+            var controller = CreateController();
+
+            var result = await controller.GenerateCertificate(request);
+
+            var fileResult = Assert.IsType<FileContentResult>(result);
+            Assert.Equal("application/pdf", fileResult.ContentType);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempDocx)) System.IO.File.Delete(tempDocx);
+            if (System.IO.File.Exists(tempPdf)) System.IO.File.Delete(tempPdf);
+        }
+    }
 }

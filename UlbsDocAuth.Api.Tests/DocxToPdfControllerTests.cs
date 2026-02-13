@@ -18,7 +18,6 @@ public class DocxToPdfControllerTests
         var converter = new Mock<IDocxToPdfConverter>(MockBehavior.Strict);
         var controller = new DocxToPdfController(env.Object, converter.Object);
 
-        // null IFormFile isn't possible at runtime, but we can simulate an empty file
         var file = new FormFile(Stream.Null, 0, 0, "file", "a.docx");
         var result = await controller.Convert(file, CancellationToken.None);
 
@@ -62,5 +61,76 @@ public class DocxToPdfControllerTests
 
         Assert.IsType<FileContentResult>(result);
         converter.VerifyAll();
+    }
+
+    [Fact]
+    public async Task Convert_FileTooLarge_ReturnsBadRequest()
+    {
+        var env = new Mock<Microsoft.Extensions.Hosting.IHostEnvironment>();
+        var converter = new Mock<IDocxToPdfConverter>();
+        var controller = new DocxToPdfController(env.Object, converter.Object);
+
+        var fileMock = new Mock<IFormFile>();
+        fileMock.Setup(f => f.Length).Returns(26 * 1024 * 1024);
+        fileMock.Setup(f => f.FileName).Returns("large.docx");
+
+        var result = await controller.Convert(fileMock.Object, CancellationToken.None);
+
+        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+
+        // Aici era warning-ul, acum e rezolvat cu '?'
+        Assert.Contains("File too large", badRequest.Value?.ToString());
+    }
+
+    [Fact]
+    public async Task Convert_Win32Exception_InProduction_Returns501_WithSimpleMessage()
+    {
+        var env = new Mock<Microsoft.Extensions.Hosting.IHostEnvironment>();
+        env.SetupGet(e => e.EnvironmentName).Returns("Production");
+
+        var converter = new Mock<IDocxToPdfConverter>();
+        converter.Setup(c => c.ConvertAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new System.ComponentModel.Win32Exception("Access denied or missing file"));
+
+        var controller = new DocxToPdfController(env.Object, converter.Object);
+
+        var file = new FormFile(new MemoryStream(new byte[] { 1 }), 0, 1, "file", "test.docx");
+
+        var result = await controller.Convert(file, CancellationToken.None);
+
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(501, objectResult.StatusCode);
+
+        var valStr = objectResult.Value?.ToString();
+        Assert.Contains("DOCX->PDF converter dependency is missing", valStr);
+    }
+
+    [Fact]
+    public async Task Convert_GeneralException_InProduction_Returns500_WithSimpleMessage()
+    {
+        var env = new Mock<Microsoft.Extensions.Hosting.IHostEnvironment>();
+        env.SetupGet(e => e.EnvironmentName).Returns("Production");
+
+        var converter = new Mock<IDocxToPdfConverter>();
+        converter.Setup(c => c.ConvertAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Something exploded internally"));
+
+        var controller = new DocxToPdfController(env.Object, converter.Object);
+
+        var file = new FormFile(new MemoryStream(new byte[] { 1 }), 0, 1, "file", "test.docx");
+
+        var result = await controller.Convert(file, CancellationToken.None);
+
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, objectResult.StatusCode);
+
+        
+        Assert.NotNull(objectResult.Value); 
+
+        var props = objectResult.Value.GetType().GetProperties();
+        var detailsProp = props.FirstOrDefault(p => p.Name == "details");
+        var detailsValue = detailsProp?.GetValue(objectResult.Value)?.ToString();
+
+        Assert.Equal("Something exploded internally", detailsValue);
     }
 }
