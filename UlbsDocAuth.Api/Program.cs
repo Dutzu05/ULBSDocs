@@ -1,6 +1,7 @@
 using UlbsDocAuth.Api.Services.Interfaces;
 using UlbsDocAuth.Api.Services.Mock;
 using UlbsDocAuth.Api.Services.Google;
+using UlbsDocAuth.Api.Services;
 using UlbsDocAuth.Api.Services.DocxToPdf;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.FileProviders;
@@ -31,6 +32,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ICertificateDataService, MockCertificateDataService>();
 
 builder.Services.AddSingleton<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
+builder.Services.AddScoped<IWordTemplateService, WordTemplateService>();
 
 builder.Services.AddSingleton<IDocxToPdfConverter>(_ =>
     RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
