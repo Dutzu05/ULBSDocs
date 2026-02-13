@@ -15,8 +15,7 @@ public class CertificatesController(
     IDocxToPdfConverter pdfConverter        
     ) : ControllerBase
 {
-    // --- ACEASTA ESTE METODA CARE LIPSEA SAU AVEA NUME GREȘIT ---
-    // Ruta trebuie să fie "mock" pentru că așa o apelează app.js
+    
     [HttpGet("mock")]
     public IActionResult GetMockByEmail([FromQuery] string email)
     {
@@ -30,7 +29,7 @@ public class CertificatesController(
             
         return Ok(student);
     }
-    // -------------------------------------------------------------
+   
 
     [HttpPost("generate")]
     public async Task<IActionResult> GenerateCertificate([FromBody] GenerateRequest request)
@@ -47,13 +46,13 @@ public class CertificatesController(
 
         try
         {
-            // 1. Generăm DOCX
+           
             tempDocxPath = templateService.GenerateDocx(student, request.Reason);
 
-            // 2. Pregătim PDF
+            
             tempPdfPath = Path.ChangeExtension(tempDocxPath, ".pdf");
 
-            // 3. Convertim
+            
             await pdfConverter.ConvertAsync(tempDocxPath, tempPdfPath, CancellationToken.None);
 
             if (!System.IO.File.Exists(tempPdfPath))

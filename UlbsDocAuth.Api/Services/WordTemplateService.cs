@@ -1,12 +1,12 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using UlbsDocAuth.Api.DTOs; // <--- Importăm DTO-ul tău
+using UlbsDocAuth.Api.DTOs; 
 
 namespace UlbsDocAuth.Api.Services;
 
 public interface IWordTemplateService
 {
-    // Primim datele exact sub forma DTO-ului tău
+    
     string GenerateDocx(CertificateResponse studentData, string reason);
 }
 
@@ -16,16 +16,14 @@ public class WordTemplateService : IWordTemplateService
 
     public WordTemplateService(IWebHostEnvironment env)
     {
-        // Calea către template: folderul "Templates" din rădăcina proiectului
+       
         _templatePath = Path.Combine(env.ContentRootPath, "Templates", "Adeverinta_2_Completat.docx"); 
-        // ATENȚIE: Verifică extensia! Dacă e .doc vechi, OpenXml nu merge. Trebuie .docx
-        // Recomand să salvezi template-ul ca .docx în Word.
+       
     }
 
     public string GenerateDocx(CertificateResponse studentData, string reason)
     {
-        // Verificăm dacă fișierul template există
-        // Notă: Dacă ai extensia .doc, schimbă mai jos în .docx după ce convertești fișierul
+        
         var templateExtension = Path.GetExtension(_templatePath);
         
 
@@ -34,11 +32,11 @@ public class WordTemplateService : IWordTemplateService
             throw new FileNotFoundException($"Template-ul nu a fost găsit la: {_templatePath}");
         }
 
-        // Creăm un fișier temporar unic
+       
         var tempFilePath = Path.Combine(Path.GetTempPath(), $"Adeverinta_{Guid.NewGuid()}.docx");
         File.Copy(_templatePath, tempFilePath, true);
 
-        // Mapăm datele din CertificateResponse către textul din Word
+       
         var replacements = new Dictionary<string, string>
         {
             { "{{NumeComplet}}", studentData.FullName ?? "" },
@@ -49,24 +47,35 @@ public class WordTemplateService : IWordTemplateService
             { "{{Grupa}}",       studentData.Group ?? "" }
         };
 
-        // Deschidem și modificăm
-        using (var wordDoc = WordprocessingDocument.Open(tempFilePath, true))
+       
+       using (var wordDoc = WordprocessingDocument.Open(tempFilePath, true))
+    {
+       
+        var mainPart = wordDoc.MainDocumentPart;
+        if (mainPart?.Document?.Body == null)
         {
-            var body = wordDoc.MainDocumentPart.Document.Body;
-
-            foreach (var text in body.Descendants<Text>())
-            {
-                foreach (var item in replacements)
-                {
-                    if (text.Text.Contains(item.Key))
-                    {
-                        text.Text = text.Text.Replace(item.Key, item.Value);
-                    }
-                }
-            }
-            wordDoc.MainDocumentPart.Document.Save();
+            throw new InvalidOperationException("Documentul Word este invalid sau lipsește corpul (body).");
         }
 
-        return tempFilePath;
+        var body = mainPart.Document.Body;
+
+        foreach (var text in body.Descendants<Text>())
+        {
+           
+            if (string.IsNullOrEmpty(text.Text)) continue;
+
+            foreach (var item in replacements)
+            {
+                if (text.Text.Contains(item.Key))
+                {
+                    text.Text = text.Text.Replace(item.Key, item.Value);
+                }
+            }
+        }
+        
+        mainPart.Document.Save();
+    }
+
+    return tempFilePath;
     }
 }
