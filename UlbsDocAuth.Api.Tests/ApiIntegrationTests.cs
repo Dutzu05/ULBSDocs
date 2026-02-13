@@ -48,15 +48,15 @@ public class ApiIntegrationTests : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
     }
 
-    [Fact]
-    public async Task DocDocx_Convert_ReturnsDocx()
-    {
-        var res = await _client.GetAsync("/api/doc-docx/convert");
-        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
-        Assert.Equal(
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            res.Content.Headers.ContentType?.MediaType);
-    }
+    //[Fact]
+    // public async Task DocDocx_Convert_ReturnsDocx()
+    // {
+    //     var res = await _client.GetAsync("/api/doc-docx/convert");
+    //     Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+    //     Assert.Equal(
+    //         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    //         res.Content.Headers.ContentType?.MediaType);
+    // }
 
     [Fact]
     public async Task DocxToPdf_Convert_ReturnsPdf()

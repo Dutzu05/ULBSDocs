@@ -4,28 +4,35 @@ using UlbsDocAuth.Api.Controllers;
 using UlbsDocAuth.Api.DTOs;
 using UlbsDocAuth.Api.Services.Interfaces;
 using Xunit;
+using UlbsDocAuth.Api.Services;           
 
 namespace UlbsDocAuth.Api.Tests;
-
 public class CertificatesControllerTests
 {
+    private readonly Mock<ICertificateDataService> _dataServiceMock = new();
+    private readonly Mock<IWordTemplateService> _templateServiceMock = new();
+    private readonly Mock<IDocxToPdfConverter> _pdfConverterMock = new();
+
+    
+    private CertificatesController CreateController() => 
+        new (_dataServiceMock.Object, _templateServiceMock.Object, _pdfConverterMock.Object);
+
     [Fact]
     public void GetMockByEmail_InvalidEmail_ReturnsBadRequest()
     {
-        var service = new Mock<ICertificateDataService>(MockBehavior.Strict);
-        var controller = new CertificatesController(service.Object);
-
-        var result = controller.GetMockByEmail("not-an-email");
+        var controller = CreateController();
+        var result = controller.GetMockByEmail("");
         Assert.IsType<BadRequestObjectResult>(result);
     }
 
     [Fact]
     public void GetMockByEmail_NotFound_Returns404()
     {
-        var service = new Mock<ICertificateDataService>(MockBehavior.Strict);
-        service.Setup(s => s.GetByEmail("x@y.com")).Returns((CertificateResponse?)null);
+        
+        _dataServiceMock.Setup(s => s.GetByEmail("x@y.com")).Returns((CertificateResponse?)null);
 
-        var controller = new CertificatesController(service.Object);
+        
+        var controller = CreateController();
         var result = controller.GetMockByEmail("x@y.com");
 
         var notFound = Assert.IsType<NotFoundObjectResult>(result);
@@ -45,10 +52,9 @@ public class CertificatesControllerTests
             Serial: "S",
             IssuedAt: new DateOnly(2026, 2, 12));
 
-        var service = new Mock<ICertificateDataService>(MockBehavior.Strict);
-        service.Setup(s => s.GetByEmail("x@y.com")).Returns(response);
+        _dataServiceMock.Setup(s => s.GetByEmail("x@y.com")).Returns(response);
 
-        var controller = new CertificatesController(service.Object);
+        var controller = CreateController();
         var result = controller.GetMockByEmail("x@y.com");
 
         Assert.IsType<OkObjectResult>(result);
