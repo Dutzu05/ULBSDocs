@@ -1,0 +1,16 @@
+# Example ngrok config for this repo.
+# Copy to ngrok.yml and run:
+#   ngrok start ulbs-doc-auth --config ./ngrok.yml
+#
+# NOTE:
+# - Do NOT put authtokens in this repo.
+# - Add your authtoken via: ngrok config add-authtoken <token>
+# - The generated public URL must be added to Google OAuth "Authorized JavaScript origins".
+
+version: "2"
+
+tunnels:
+  ulbs-doc-auth:
+    proto: http
+    addr: 3000
+    host_header: localhost:3000

@@ -13,7 +13,7 @@ on:
 jobs:
   e2e:
     if: ${{ (github.event_name == 'workflow_dispatch' && inputs.base_url != '') || (secrets.STAGING_BASE_URL != '') }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, build-01]
 
     steps:
       - uses: actions/checkout@v4

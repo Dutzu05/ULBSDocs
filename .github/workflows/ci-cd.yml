@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: [self-hosted, build-01]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore
+        run: dotnet restore UlbsDocAuth.sln
+      - name: Build (warnings as errors)
+        run: dotnet build UlbsDocAuth.sln -c Release -warnaserror
+
+  test:
+    runs-on: [self-hosted, build-01]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: |
+          dotnet test UlbsDocAuth.Api.Tests/UlbsDocAuth.Api.Tests.csproj -c Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:Threshold=80 \
+            /p:ThresholdType=line \
+            /p:ThresholdStat=total
+      - name: Upload coverage (Cobertura)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-cobertura
+          path: UlbsDocAuth.Api.Tests/coverage.cobertura.xml
+          if-no-files-found: error
+
+  build:
+    needs: [lint, test]
+    runs-on: [self-hosted, build-01]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select container CLI (docker or podman)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v docker >/dev/null 2>&1; then
+            echo "CONTAINER_CLI=docker" >> "$GITHUB_ENV"
+          elif command -v podman >/dev/null 2>&1; then
+            echo "CONTAINER_CLI=podman" >> "$GITHUB_ENV"
+          else
+            echo "Neither docker nor podman is available on this runner." >&2
+            exit 1
+          fi
+      - name: Build API image
+        shell: bash
+        run: |
+          set -euo pipefail
+          $CONTAINER_CLI build -f UlbsDocAuth.Api/Dockerfile -t ulbs-doc-auth-api:ci .
+      - name: Build Frontend image
+        shell: bash
+        run: |
+          set -euo pipefail
+          $CONTAINER_CLI build -f frontend/Dockerfile -t ulbs-doc-auth-frontend:ci .
+
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: [self-hosted, build-01]
+    steps:
+      - name: Deploy to staging
+        run: echo "Deploy to staging"
+
+  deploy-production:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, build-01]
+    environment: production
+    steps:
+      - name: Deploy to production
+        run: echo "Deploy to production"
