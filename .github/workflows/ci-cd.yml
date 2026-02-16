@@ -10,7 +10,7 @@ jobs:
   lint:
     runs-on: [self-hosted, build-01]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Restore
         run: dotnet restore UlbsDocAuth.sln
       - name: Build (warnings as errors)
@@ -19,7 +19,7 @@ jobs:
   test:
     runs-on: [self-hosted, build-01]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Test
         run: |
           dotnet test UlbsDocAuth.Api.Tests/UlbsDocAuth.Api.Tests.csproj -c Release \
@@ -40,7 +40,7 @@ jobs:
     needs: [lint, test]
     runs-on: [self-hosted, build-01]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Select container CLI (docker or podman)
         shell: bash
         run: |
